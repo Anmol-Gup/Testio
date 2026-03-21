@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Package, CreditCard, Settings, LogOut, Sparkles, Users, MessageSquare, ChevronLeft, ChevronRight, Code } from 'lucide-react';
+import { LayoutDashboard, Package, CreditCard, Settings, LogOut, Sparkles, Users, MessageSquare, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useState } from 'react';
 

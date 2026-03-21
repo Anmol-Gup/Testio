@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, Sparkles, Loader2, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -31,7 +31,7 @@ export default function ResetPasswordPage() {
                     router.push('/login');
                 }, 3000);
             }
-        } catch (err) {
+        } catch {
             setError('An unexpected error occurred.');
         } finally {
             setLoading(false);

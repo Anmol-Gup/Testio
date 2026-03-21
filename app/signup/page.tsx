@@ -38,7 +38,7 @@ export default function SignupPage() {
                     router.push('/login?signup=success');
                 }, 2000);
             }
-        } catch (err) {
+        } catch {
             setError('An unexpected error occurred during signup.');
         } finally {
             setLoading(false);

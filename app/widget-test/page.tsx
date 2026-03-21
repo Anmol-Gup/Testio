@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, Code, ExternalLink, CheckCircle2, Copy } from 'lucide-react';
+import { Sparkles, ExternalLink, CheckCircle2, Copy } from 'lucide-react';
 
 export default function WidgetTestPage() {
     const [productId, setProductId] = useState('');
@@ -156,7 +156,7 @@ export default function WidgetTestPage() {
                     <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#6d28d9', margin: '0 0 0.75rem' }}>📋 How to embed on your website</h3>
                     <ol style={{ fontSize: '0.875rem', color: '#71717a', paddingLeft: '1.25rem', lineHeight: 2, margin: 0 }}>
                         <li>Copy the embed code above</li>
-                        <li>Paste it in your website's HTML where you want testimonials to appear</li>
+                        <li>Paste it in your website’s HTML where you want testimonials to appear</li>
                         <li>Only <strong>approved</strong> testimonials will be shown</li>
                         <li>The widget automatically refreshes every 60 seconds</li>
                     </ol>

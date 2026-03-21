@@ -1,12 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, ArrowRight, Sparkles, Loader2, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
+    return (
+        <Suspense
+            fallback={
+                <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ color: 'var(--secondary)', fontWeight: 600 }}>Loading…</div>
+                </div>
+            }
+        >
+            <LoginPageInner />
+        </Suspense>
+    );
+}
+
+function LoginPageInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const signupSuccess = searchParams.get('signup') === 'success';

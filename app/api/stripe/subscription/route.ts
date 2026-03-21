@@ -79,14 +79,17 @@ export async function POST(req: Request) {
         const activeSubscription = subscriptions.data.find((sub) => ACTIVE_STATUSES.has(sub.status));
         const chosen = activeSubscription ?? subscriptions.data[0] ?? null;
 
+        const currentPeriodEndUnix = (activeSubscription as unknown as { current_period_end?: number }).current_period_end;
+        const currentPeriodEnd = typeof currentPeriodEndUnix === 'number'
+            ? new Date(currentPeriodEndUnix * 1000).toISOString()
+            : null;
+
         return NextResponse.json({
             hasCustomer: true,
             hasAnySubscription: subscriptions.data.length > 0,
             isActive: !!activeSubscription,
             cancelAtPeriodEnd: activeSubscription?.cancel_at_period_end ?? false,
-            currentPeriodEnd: activeSubscription?.current_period_end
-                ? new Date(activeSubscription.current_period_end * 1000).toISOString()
-                : null,
+            currentPeriodEnd,
             status: chosen?.status ?? null,
         });
     } catch (error: unknown) {

@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-    apiVersion: '2023-10-16' as any,
+    apiVersion: '2023-10-16' as Stripe.StripeConfig['apiVersion'],
 });
 
 export async function createCheckoutSession(userId: string, plan: 'starter' | 'pro', customerEmail: string) {

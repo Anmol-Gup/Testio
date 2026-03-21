@@ -60,7 +60,7 @@ export default function TestimonialWidget({ params }: { params: { id: string } }
                             lineHeight: '1.5',
                             color: '#1e293b',
                             marginBottom: '1rem'
-                        }}>"{t.content}"</p>
+                        }}>“{t.content}”</p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <div style={{
                                 width: '32px',
