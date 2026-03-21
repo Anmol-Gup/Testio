@@ -1,42 +1,78 @@
 # Testio
 
-Complete product and technical documentation is available in:
+Testio automates testimonial collection for SaaS founders: send requests anytime (immediately or scheduled), follow up once, and display approved testimonials on your website with a lightweight embeddable widget.
 
-- [`documentation.md`](./documentation.md)
+For deeper technical docs, see `documentation.md`.
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## What You Can Do
+- Create products and add customers (email list)
+- Send testimonial requests immediately, or schedule them (e.g., 3 days after upgrade)
+- Automatically follow up once if a customer hasn’t responded
+- Review and approve testimonials before publishing
+- Embed a “social proof” widget on your website
 
-## Getting Started
+## Tech Stack
+- Next.js App Router (React 18)
+- Supabase (Auth + Postgres)
+- Stripe (subscriptions + customer portal)
+- Nodemailer (SMTP email sending)
+- Swagger UI at `/api-docs` (spec: `public/openapi.json`)
 
-First, run the development server:
+## Local Development
+Requirements: Node.js 20+ and npm.
 
+1. Install deps:
+   ```bash
+   npm install
+   ```
+2. Create your env file:
+   ```bash
+   cp .env.example .env.local
+   ```
+3. Fill `.env.local` (Supabase + SMTP + Stripe). Optional: add `GEMINI_API_KEY` for AI polish.
+4. Start dev server:
+   ```bash
+   npm run dev
+   ```
+5. Open `http://localhost:3000`.
+
+## Database
+This app uses Supabase tables like `users`, `products`, `customers`, and `testimonials` (see `documentation.md` for the expected fields).
+
+There’s also a starter schema in `schema.sql`, but it uses a legacy `profiles` table name — adjust it to match your current DB schema if needed.
+
+## Stripe Setup (Webhooks + Billing)
+Set these in `.env.local`:
+- `STRIPE_SECRET_KEY`
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+
+Webhook endpoint (recommended):
+- `POST /api/stripe/webhook`
+
+Compatibility endpoints (to avoid 404s if you previously configured an older URL):
+- `POST /api/v1/stripe/webhook`
+- `POST /api/v1/stripe-billing/stripe/webhook`
+
+Local webhook forwarding (Stripe CLI example):
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+stripe listen --forward-to http://localhost:3000/api/stripe/webhook
+```
+Use the printed `whsec_...` value as `STRIPE_WEBHOOK_SECRET`.
+
+## Key Routes
+Dashboard (authenticated):
+- `/products`, `/customers`, `/testimonials`, `/billing`
+
+Public:
+- Submit form: `/submit/[productId]?cid=[customerId]`
+- Widget JS: `GET /api/widget?id=[productId]`
+
+Embed example:
+```html
+<div id="testio-widget"></div>
+<script src="http://localhost:3000/api/widget?id=YOUR_PRODUCT_ID" defer></script>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Automation (Cron)
+`GET /api/cron` sends scheduled initial emails and reminder follow-ups (secured with `CRON_SECRET`). See `documentation.md` for details.
