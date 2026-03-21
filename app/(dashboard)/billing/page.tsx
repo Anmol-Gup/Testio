@@ -43,12 +43,10 @@ export default function BillingPage() {
     const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
     const [currentPlan, setCurrentPlan] = useState('Free');
     const [usage, setUsage] = useState(0); // Emails
-    const [testimonialsCount, setTestimonialsCount] = useState(0);
     const [productsCount, setProductsCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [isUpgrading, setIsUpgrading] = useState<string | null>(null);
     const [isPortalLoading, setIsPortalLoading] = useState(false);
-    const [hasStripeId, setHasStripeId] = useState(false);
     const [subscriptionStatus, setSubscriptionStatus] = useState<{
         hasCustomer: boolean;
         hasAnySubscription: boolean;
@@ -75,8 +73,6 @@ export default function BillingPage() {
             const { data: dbUser } = await supabase.from('users').select('plan, stripe_customer_id').eq('id', user.id).single();
             const plan = dbUser?.plan || user.user_metadata?.plan || 'Free';
             setCurrentPlan(plan);
-            setHasStripeId(!!dbUser?.stripe_customer_id);
-
             // Fetch real Stripe subscription state (not just whether a customer id exists)
             setIsSubscriptionLoading(true);
             try {
@@ -87,7 +83,6 @@ export default function BillingPage() {
                 });
                 const subData = await subRes.json();
                 if (!subData?.error) {
-                    setHasStripeId(!!subData.hasCustomer);
                     setSubscriptionStatus(subData);
                 }
             } finally {
@@ -114,14 +109,6 @@ export default function BillingPage() {
                 .eq('user_id', user.id);
             setProductsCount(pCount || 0);
 
-            // Fetch testimonials count
-            const { count: tCount } = await supabase
-                .from('testimonials')
-                .select('id, products!inner(user_id)', { count: 'exact', head: true })
-                .eq('products.user_id', user.id)
-                .eq('status', 'approved');
-            setTestimonialsCount(tCount || 0);
-
             setLoading(false);
 
             // Handle Stripe redirect returns
@@ -146,8 +133,6 @@ export default function BillingPage() {
                         upgradeVerified = false;
                     } else {
                         setCurrentPlan(verifyData.plan);
-                        setHasStripeId(true);
-
                         // Refresh subscription state for the new customer/subscription.
                         setIsSubscriptionLoading(true);
                         try {
@@ -160,7 +145,6 @@ export default function BillingPage() {
                             if (subData?.error) {
                                 setToast({ message: `Stripe status error: ${subData.error}`, type: 'error' });
                             } else {
-                                setHasStripeId(!!subData.hasCustomer);
                                 setSubscriptionStatus(subData);
                             }
                         } finally {
@@ -189,8 +173,6 @@ export default function BillingPage() {
                             setToast({ message: `Stripe status error: ${subData.error}`, type: 'error' });
                         } else {
                             setSubscriptionStatus(subData);
-                            setHasStripeId(!!subData.hasCustomer);
-
                             if (subData.cancelAtPeriodEnd && subData.currentPeriodEnd) {
                                 const endDate = new Date(subData.currentPeriodEnd).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
                                 setToast({ message: `Cancellation scheduled. You'll keep access until ${endDate}.`, type: 'success' });
@@ -232,8 +214,8 @@ export default function BillingPage() {
 
             // Redirect to Stripe hosted checkout
             window.location.href = data.url;
-        } catch (error: any) {
-            setToast({ message: error.message, type: 'error' });
+        } catch (error: unknown) {
+            setToast({ message: error instanceof Error ? error.message : 'Unknown error', type: 'error' });
             setIsUpgrading(null);
         }
     };
@@ -254,8 +236,8 @@ export default function BillingPage() {
             if (data.error) throw new Error(data.error);
 
             window.location.href = data.url;
-        } catch (error: any) {
-            setToast({ message: error.message, type: 'error' });
+        } catch (error: unknown) {
+            setToast({ message: error instanceof Error ? error.message : 'Unknown error', type: 'error' });
         } finally {
             setIsPortalLoading(false);
         }
@@ -326,7 +308,7 @@ export default function BillingPage() {
                 <div style={{ marginBottom: '2rem' }}>
                     <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '0 0 0.25rem 0' }}>Current Usage</h2>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: '#71717a' }}>
-                        You're on the <span style={{ background: '#f4f4f5', padding: '2px 8px', borderRadius: '12px', color: '#09090b', fontWeight: 700, fontSize: '0.75rem' }}>{currentPlan}</span> plan
+                        You’re on the <span style={{ background: '#f4f4f5', padding: '2px 8px', borderRadius: '12px', color: '#09090b', fontWeight: 700, fontSize: '0.75rem' }}>{currentPlan}</span> plan
                     </div>
                 </div>
 

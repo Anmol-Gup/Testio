@@ -1,10 +1,20 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Star } from 'lucide-react';
 
+type Testimonial = {
+    id: string;
+    customer_name: string;
+    company?: string | null;
+    content: string;
+    rating?: number | null;
+};
+
 export default function TestimonialWidget({ params }: { params: { id: string } }) {
     const [ownerPlan, setOwnerPlan] = useState<string>('');
-    const [testimonials, setTestimonials] = useState<any[]>([
+    const [testimonials, setTestimonials] = useState<Testimonial[]>([
         { id: '1', customer_name: 'Mark Z', company: 'DevFlow', content: 'This tool saved me hours of manual work! The automation is just perfect.', rating: 5 },
         { id: '2', customer_name: 'Sarah J', company: 'DesignCloud', content: 'The easiest way to get feedback from customers I have ever seen.', rating: 5 }
     ]);
