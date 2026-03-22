@@ -400,14 +400,15 @@ export default function GlobalCustomersPage() {
             ) : (
                 <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                     <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <div className="table-scroll">
+<table className="data-table">
                             <thead>
-                                <tr style={{ textAlign: 'left', background: 'var(--input)' }}>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Email</th>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Product</th>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Status</th>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Joined</th>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800, textAlign: 'right' }}>Actions</th>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Product</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th className="text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -415,9 +416,9 @@ export default function GlobalCustomersPage() {
                                     <tr><td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#71717a' }}>No customers found.</td></tr>
                                 ) : customers.map((customer) => (
                                     <tr key={customer.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                                        <td style={{ padding: '1.25rem 2rem', fontSize: '0.9375rem', fontWeight: 600, color: '#09090b' }}>{customer.email}</td>
-                                        <td style={{ padding: '1.25rem 2rem', fontSize: '0.9375rem', color: '#71717a' }}>{customer.products?.name}</td>
-                                        <td style={{ padding: '1.25rem 2rem' }}>
+                                        <td style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#09090b' }}>{customer.email}</td>
+                                        <td style={{ fontSize: '0.9375rem', color: '#71717a' }}>{customer.products?.name}</td>
+                                        <td>
                                             <span style={{
                                                 fontSize: '0.65rem',
                                                 background: customer.status === 'responded' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
@@ -431,8 +432,8 @@ export default function GlobalCustomersPage() {
                                                 height: '22px'
                                             }}>{customer.status.replace('_', ' ')}</span>
                                         </td>
-                                        <td style={{ padding: '1.25rem 2rem', fontSize: '0.875rem', color: '#71717a' }}>{new Date(customer.created_at).toLocaleDateString()}</td>
-                                        <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
+                                        <td style={{ fontSize: '0.875rem', color: '#71717a' }}>{new Date(customer.created_at).toLocaleDateString()}</td>
+                                        <td className="text-right">
                                             <button 
                                                 onClick={() => handleDeleteCustomer(customer.id)} 
                                                 disabled={deletingId === customer.id}
@@ -447,6 +448,7 @@ export default function GlobalCustomersPage() {
                                 ))}
                             </tbody>
                         </table>
+</div>
                     </div>
                     {totalCount > PAGE_SIZE && (
                         <div style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--input)' }}>
@@ -478,82 +480,77 @@ export default function GlobalCustomersPage() {
 
             {/* Add Customer Modal */}
             {isAddModalOpen && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 100,
-                    backdropFilter: 'blur(4px)'
-                }} onClick={() => !isSubmitting && setIsAddModalOpen(false)}>
-                    <div style={{
-                        background: 'white',
-                        padding: '2rem',
-                        borderRadius: '24px',
-                        width: '100%',
-                        maxWidth: '420px',
-                        boxShadow: 'var(--shadow-lg)'
-                    }} onClick={e => e.stopPropagation()}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', color: '#09090b' }}>Add New Customer</h2>
-                            <button onClick={() => setIsAddModalOpen(false)} style={{ color: '#71717a' }} disabled={isSubmitting}><X size={24} /></button>
-                        </div>
-                        <form onSubmit={handleAddCustomer} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#09090b' }}>Select Product</label>
-                                <select 
-                                    className="input select-input"
-                                    value={selectedProductId}
-                                    onChange={(e) => setSelectedProductId(e.target.value)}
-                                    required
-                                    disabled={products.length === 0}
+                <div className="modal-overlay" onClick={() => !isSubmitting && setIsAddModalOpen(false)}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                        <div className="modal-card">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Add New Customer</h2>
+                                <button
+                                    onClick={() => setIsAddModalOpen(false)}
+                                    className="modal-close-btn"
+                                    aria-label="Close"
+                                    disabled={isSubmitting}
+                                    type="button"
                                 >
-                                    <option value="" disabled>Choose a product</option>
-                                    {products.map(p => (
-                                        <option key={p.id} value={p.id}>{p.name}</option>
-                                    ))}
-                                </select>
+                                    <X size={20} />
+                                </button>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#09090b' }}>Customer Email</label>
-                                <input
-                                    type="email"
-                                    placeholder="customer@example.com"
-                                    className="input"
-                                    value={customerEmail}
-                                    onChange={(e) => setCustomerEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.25rem 0' }}>
-                                <input
-                                    type="checkbox"
-                                    id="sendImmediatelyGlobal"
-                                    checked={sendImmediately}
-                                    onChange={(e) => setSendImmediately(e.target.checked)}
-                                    style={{ width: '16px', height: '16px', cursor: 'pointer' }}
-                                />
-                                <label htmlFor="sendImmediatelyGlobal" style={{ fontSize: '0.875rem', color: '#3f3f46', cursor: 'pointer', fontWeight: 500 }}>
-                                    Send testimonial request email immediately
-                                </label>
-                            </div>
-                            <p style={{ fontSize: '0.75rem', color: '#71717a', margin: '-0.5rem 0 0' }}>
-                                {sendImmediately
-                                    ? "We'll send the request now. A reminder will follow in 3 days if they don't respond."
-                                    : "We'll automatically request a testimonial 3 days from now."}
-                            </p>
-                            <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ width: '100%', marginTop: '0.75rem', padding: '0.875rem' }}>
-                                {isSubmitting ? <><Loader2 size={20} className="animate-spin" /> Starting...</> : (sendImmediately ? 'Send Email Now' : 'Start Automation')}
-                            </button>
-                        </form>
+
+                            <form onSubmit={handleAddCustomer} className="modal-form">
+                                <div className="field">
+                                    <label className="field-label">Select Product</label>
+                                    <select
+                                        className="input select-input"
+                                        value={selectedProductId}
+                                        onChange={(e) => setSelectedProductId(e.target.value)}
+                                        required
+                                        disabled={products.length === 0}
+                                    >
+                                        <option value="" disabled>Choose a product</option>
+                                        {products.map(p => (
+                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="field">
+                                    <label className="field-label">Customer Email</label>
+                                    <input
+                                        type="email"
+                                        placeholder="customer@example.com"
+                                        className="input"
+                                        value={customerEmail}
+                                        onChange={(e) => setCustomerEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="check-row">
+                                    <input
+                                        type="checkbox"
+                                        id="sendImmediatelyGlobal"
+                                        checked={sendImmediately}
+                                        onChange={(e) => setSendImmediately(e.target.checked)}
+                                    />
+                                    <label htmlFor="sendImmediatelyGlobal">
+                                        Send testimonial request email immediately
+                                    </label>
+                                </div>
+
+                                <p className="help-text" style={{ marginTop: '-0.5rem' }}>
+                                    {sendImmediately
+                                        ? "We'll send the request now. A reminder will follow in 3 days if they don't respond."
+                                        : "We'll automatically request a testimonial 3 days from now."}
+                                </p>
+
+                                <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ width: '100%', marginTop: '0.75rem', padding: '0.875rem' }}>
+                                    {isSubmitting ? <><Loader2 size={20} className="animate-spin" /> Starting...</> : (sendImmediately ? 'Send Email Now' : 'Start Automation')}
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
+
         </div>
     );
 }

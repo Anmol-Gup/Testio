@@ -144,27 +144,28 @@ export default function DashboardPage() {
                             </div>
                         </div>
                         <div>
-                            <div style={{ fontSize: '2rem', fontWeight: 800, color: '#09090b', marginBottom: '0.25rem' }}>{stat.value}</div>
-                            <div style={{ fontSize: '0.875rem', color: '#71717a', fontWeight: 600 }}>{stat.label}</div>
+                            <div className="stat-value" style={{ fontSize: '2rem', fontWeight: 800, color: '#09090b', marginBottom: '0.25rem' }}>{stat.value}</div>
+                            <div className="stat-label" style={{ fontSize: '0.875rem', color: '#71717a', fontWeight: 600 }}>{stat.label}</div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '1.25rem' }}>
+            <div className="dashboard-two-col" style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '1.25rem' }}>
                 <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                     <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h3 style={{ margin: 0 }}>Recent Customers</h3>
                         <Link href="/customers" className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>View All</Link>
                     </div>
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <div style={{ overflowX: 'hidden' }}>
+                        <div className="table-scroll">
+<table className="data-table">
                             <thead>
-                                <tr style={{ textAlign: 'left', background: 'var(--input)' }}>
-                                    <th style={{ padding: '0.875rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Email</th>
-                                    <th style={{ padding: '0.875rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Product</th>
-                                    <th style={{ padding: '0.875rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Status</th>
-                                    <th style={{ padding: '0.875rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Joined</th>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Product</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -176,9 +177,9 @@ export default function DashboardPage() {
                                     </tr>
                                 ) : recentCustomers.map((customer) => (
                                     <tr key={customer.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                                        <td style={{ padding: '1rem 2rem', fontSize: '0.9rem', fontWeight: 600, color: '#09090b' }}>{customer.email}</td>
-                                        <td style={{ padding: '1rem 2rem', fontSize: '0.9rem', color: '#71717a' }}>{customer.products?.name ?? '—'}</td>
-                                        <td style={{ padding: '1rem 2rem' }}>
+                                        <td style={{ fontSize: '0.9rem', fontWeight: 600, color: '#09090b' }}>{customer.email}</td>
+                                        <td style={{ fontSize: '0.9rem', color: '#71717a' }}>{customer.products?.name ?? '—'}</td>
+                                        <td>
                                             <span style={{
                                                 fontSize: '0.75rem',
                                                 background: customer.status === 'responded' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(113, 113, 122, 0.1)',
@@ -189,11 +190,12 @@ export default function DashboardPage() {
                                                 textTransform: 'capitalize'
                                             }}>{(customer.status ?? '').replace('_', ' ')}</span>
                                         </td>
-                                        <td style={{ padding: '1rem 2rem', fontSize: '0.875rem', color: '#71717a' }}>{new Date(customer.created_at).toLocaleDateString()}</td>
+                                        <td style={{ fontSize: '0.875rem', color: '#71717a' }}>{new Date(customer.created_at).toLocaleDateString()}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+</div>
                     </div>
                 </div>
 

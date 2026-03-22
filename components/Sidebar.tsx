@@ -2,11 +2,29 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Package, CreditCard, Settings, LogOut, Sparkles, Users, MessageSquare, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+    LayoutDashboard,
+    Package,
+    CreditCard,
+    Settings,
+    LogOut,
+    Sparkles,
+    Users,
+    MessageSquare,
+    ChevronLeft,
+    ChevronRight,
+    X,
+} from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useState } from 'react';
 
-export default function Sidebar() {
+export default function Sidebar({
+    mobileOpen,
+    onMobileClose,
+}: {
+    mobileOpen?: boolean;
+    onMobileClose?: () => void;
+}) {
     const pathname = usePathname();
     const router = useRouter();
     const [collapsed, setCollapsed] = useState(false);
@@ -29,38 +47,52 @@ export default function Sidebar() {
         }
     };
 
+    const sidebarClassName = `sidebar${collapsed ? ' collapsed' : ''}${mobileOpen ? ' mobile-open' : ''}`;
+
     return (
-        <div className={`sidebar${collapsed ? ' collapsed' : ''}`}>
-            {/* Toggle button */}
+        <div className={sidebarClassName}>
+            <button
+                className="sidebar-mobile-close"
+                aria-label="Close sidebar"
+                onClick={() => onMobileClose?.()}
+            >
+                <X size={18} />
+            </button>
+
+            {/* Desktop collapse toggle */}
             <button
                 className="sidebar-toggle"
                 onClick={() => setCollapsed(!collapsed)}
                 title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
-                {collapsed
-                    ? <ChevronRight size={12} strokeWidth={3} />
-                    : <ChevronLeft size={12} strokeWidth={3} />
-                }
+                {collapsed ? <ChevronRight size={12} strokeWidth={3} /> : <ChevronLeft size={12} strokeWidth={3} />}
             </button>
 
             {/* Logo */}
-            <div style={{
-                marginBottom: '1.75rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.625rem',
-                padding: collapsed ? '0' : '0 0.25rem',
-                justifyContent: collapsed ? 'center' : 'flex-start',
-                overflow: 'hidden',
-            }}>
+            <div
+                style={{
+                    marginBottom: '1.75rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.625rem',
+                    padding: collapsed ? '0' : '0 0.25rem',
+                    justifyContent: collapsed ? 'center' : 'flex-start',
+                    overflow: 'hidden',
+                }}
+            >
                 <Sparkles size={26} color="var(--primary)" fill="var(--primary)" style={{ flexShrink: 0 }} />
-                <h2 className="sidebar-label" style={{
-                    margin: 0,
-                    fontSize: '1.125rem',
-                    fontWeight: 800,
-                    letterSpacing: '-0.03em',
-                    color: '#09090b'
-                }}>Testio</h2>
+                <h2
+                    className="sidebar-label"
+                    style={{
+                        margin: 0,
+                        fontSize: '1.125rem',
+                        fontWeight: 800,
+                        letterSpacing: '-0.03em',
+                        color: '#09090b',
+                    }}
+                >
+                    Testio
+                </h2>
             </div>
 
             {/* Nav */}
@@ -72,6 +104,7 @@ export default function Sidebar() {
                             key={item.name}
                             href={item.href}
                             title={collapsed ? item.name : undefined}
+                            onClick={() => onMobileClose?.()}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -92,13 +125,13 @@ export default function Sidebar() {
                                 overflow: 'hidden',
                             }}
                             className="sidebar-nav-link"
-                            onMouseEnter={e => {
+                            onMouseEnter={(e) => {
                                 if (!isActive) {
                                     (e.currentTarget as HTMLElement).style.background = '#f4f4f5';
                                     (e.currentTarget as HTMLElement).style.color = '#09090b';
                                 }
                             }}
-                            onMouseLeave={e => {
+                            onMouseLeave={(e) => {
                                 if (!isActive) {
                                     (e.currentTarget as HTMLElement).style.background = 'transparent';
                                     (e.currentTarget as HTMLElement).style.color = '#71717a';
@@ -137,10 +170,10 @@ export default function Sidebar() {
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                     }}
-                    onMouseEnter={e => {
+                    onMouseEnter={(e) => {
                         (e.currentTarget as HTMLElement).style.background = '#fef2f2';
                     }}
-                    onMouseLeave={e => {
+                    onMouseLeave={(e) => {
                         (e.currentTarget as HTMLElement).style.background = 'transparent';
                     }}
                 >

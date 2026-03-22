@@ -281,19 +281,19 @@ export default function ProductsPage() {
             ) : (
                 <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                     <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <table className="data-table">
                             <thead>
-                                <tr style={{ textAlign: 'left', background: 'var(--input)' }}>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Product</th>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Stats</th>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Created</th>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800, textAlign: 'right' }}>Actions</th>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Stats</th>
+                                    <th>Created</th>
+                                    <th className="text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {products.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE).map((product) => (
                                     <tr key={product.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                                        <td style={{ padding: '1.25rem 2rem' }}>
+                                        <td>
                                             <div>
                                                 <div style={{ fontSize: '1rem', fontWeight: 700, color: '#09090b' }}>{product.name}</div>
                                                 <a href={product.website_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.8125rem', color: '#71717a', display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
@@ -301,7 +301,7 @@ export default function ProductsPage() {
                                                 </a>
                                             </div>
                                         </td>
-                                        <td style={{ padding: '1.25rem 2rem' }}>
+                                        <td>
                                             <div style={{ display: 'flex', gap: '1rem' }}>
                                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                                                     <span style={{ fontSize: '0.65rem', color: '#71717a', textTransform: 'uppercase', fontWeight: 700 }}>Approved</span>
@@ -313,10 +313,10 @@ export default function ProductsPage() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td style={{ padding: '1.25rem 2rem', fontSize: '0.875rem', color: '#71717a' }}>
+                                        <td>
                                             {new Date(product.created_at).toLocaleDateString()}
                                         </td>
-                                        <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
+                                        <td className="text-right">
                                             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                                                 <button
                                                     onClick={() => copyToClipboard(`${window.location.origin}/submit/${product.id}`, 'Share link')}
@@ -400,64 +400,57 @@ export default function ProductsPage() {
 
             {/* Modal */}
             {isModalOpen && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 100,
-                    backdropFilter: 'blur(4px)'
-                }} onClick={() => !isSubmitting && setIsModalOpen(false)}>
-                    <div style={{
-                        background: 'white',
-                        padding: '2rem',
-                        borderRadius: '24px',
-                        width: '100%',
-                        maxWidth: '420px',
-                        boxShadow: 'var(--shadow-lg)'
-                    }} onClick={e => e.stopPropagation()}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', color: '#09090b' }}>Add New Product</h2>
-                            <button onClick={() => setIsModalOpen(false)} style={{ color: '#71717a' }}><X size={24} /></button>
+                <div className="modal-overlay" onClick={() => !isSubmitting && setIsModalOpen(false)}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                        <div className="modal-card">
+                            <div className="modal-header">
+                                <h2 className="modal-title">Add New Product</h2>
+                                <button
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="modal-close-btn"
+                                    aria-label="Close"
+                                    disabled={isSubmitting}
+                                    type="button"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleAddProduct} className="modal-form">
+                                <div className="field">
+                                    <label className="field-label">Product Name</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        placeholder="e.g. Testio"
+                                        className="input"
+                                        value={newProductName}
+                                        onChange={e => setNewProductName(e.target.value)}
+                                        onKeyDown={e => { if (e.key === 'Enter') handleAddProduct(e as any) }}
+                                        autoFocus
+                                    />
+                                </div>
+                                <div className="field">
+                                    <label className="field-label">Website URL</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        placeholder="e.g. testio.com"
+                                        className="input"
+                                        value={newProductUrl}
+                                        onChange={e => setNewProductUrl(e.target.value)}
+                                        onKeyDown={e => { if (e.key === 'Enter') handleAddProduct(e as any) }}
+                                    />
+                                </div>
+                                <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ marginTop: '0.75rem', padding: '0.875rem' }}>
+                                    {isSubmitting ? <><Loader2 size={20} className="animate-spin" /> Creating...</> : 'Create Product'}
+                                </button>
+                            </form>
                         </div>
-                        <form onSubmit={handleAddProduct} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#09090b' }}>Product Name</label>
-                                <input
-                                    required
-                                    type="text"
-                                    placeholder="e.g. Testio"
-                                    className="input"
-                                    value={newProductName}
-                                    onChange={e => setNewProductName(e.target.value)}
-                                    onKeyDown={e => { if (e.key === 'Enter') handleAddProduct(e as any) }}
-                                    autoFocus
-                                />
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: '#09090b' }}>Website URL</label>
-                                <input
-                                    required
-                                    type="text"
-                                    placeholder="e.g. testio.com"
-                                    className="input"
-                                    value={newProductUrl}
-                                    onChange={e => setNewProductUrl(e.target.value)}
-                                    onKeyDown={e => { if (e.key === 'Enter') handleAddProduct(e as any) }}
-                                />
-                            </div>
-                            <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ marginTop: '0.75rem', padding: '0.875rem' }}>
-                                {isSubmitting ? <><Loader2 size={20} className="animate-spin" /> Creating...</> : 'Create Product'}
-                            </button>
-                        </form>
                     </div>
                 </div>
             )}
+
             <style>{`
                 @keyframes fadeIn {
                     from { opacity: 0; }

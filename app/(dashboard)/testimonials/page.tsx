@@ -172,14 +172,15 @@ export default function GlobalTestimonialsPage() {
             ) : (
                 <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                     <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <div className="table-scroll">
+<table className="data-table">
                             <thead>
-                                <tr style={{ textAlign: 'left', background: 'var(--input)' }}>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Customer</th>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Product</th>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Testimonial</th>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800 }}>Status</th>
-                                    <th style={{ padding: '1.25rem 2rem', fontSize: '0.75rem', textTransform: 'uppercase', color: '#71717a', fontWeight: 800, textAlign: 'right' }}>Actions</th>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Testimonial</th>
+                                    <th>Status</th>
+                                    <th className="text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -187,7 +188,7 @@ export default function GlobalTestimonialsPage() {
                                     <tr><td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: '#71717a' }}>No testimonials found.</td></tr>
                                 ) : testimonials.map((t) => (
                                     <tr key={t.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                                        <td style={{ padding: '1.25rem 2rem' }}>
+                                        <td>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                                 <div style={{ width: '32px', height: '32px', background: 'var(--input)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.7rem', color: 'var(--primary)', flexShrink: 0 }}>
                                                     {t.customer_name?.[0] || 'U'}
@@ -202,8 +203,8 @@ export default function GlobalTestimonialsPage() {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td style={{ padding: '1.25rem 2rem', fontSize: '0.875rem', color: '#71717a' }}>{t.products?.name}</td>
-                                        <td style={{ padding: '1.25rem 2rem' }}>
+                                        <td style={{ fontSize: '0.875rem', color: '#71717a' }}>{t.products?.name}</td>
+                                        <td className="cell-wrap">
                                             <p style={{
                                                 fontSize: '0.875rem',
                                                 color: '#09090b',
@@ -217,7 +218,7 @@ export default function GlobalTestimonialsPage() {
                                                 fontStyle: 'italic'
                                             }}>"{t.content}"</p>
                                         </td>
-                                        <td style={{ padding: '1.25rem 2rem' }}>
+                                        <td>
                                             <span style={{
                                                 fontSize: '0.65rem',
                                                 background: t.status === 'approved' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
@@ -231,7 +232,7 @@ export default function GlobalTestimonialsPage() {
                                                 height: '22px'
                                             }}>{t.status === 'approved' ? 'Approved' : 'Pending'}</span>
                                         </td>
-                                        <td style={{ padding: '1.25rem 2rem', textAlign: 'right' }}>
+                                        <td className="text-right">
                                             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                                                 <button
                                                     onClick={() => setViewingTestimonial(t)}
@@ -265,6 +266,7 @@ export default function GlobalTestimonialsPage() {
                                 ))}
                             </tbody>
                         </table>
+</div>
                     </div>
                     {totalCount > PAGE_SIZE && (
                         <div style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--input)' }}>
@@ -295,72 +297,56 @@ export default function GlobalTestimonialsPage() {
             )}
             {/* View Testimonial Modal */}
             {isMounted && viewingTestimonial && createPortal((
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 100,
-                    backdropFilter: 'blur(4px)'
-                }} onClick={() => setViewingTestimonial(null)}>
-                    <div style={{
-                        background: 'white',
-                        padding: '1.75rem',
-                        borderRadius: '24px',
-                        width: '100%',
-                        maxWidth: '480px',
-                        boxShadow: 'var(--shadow-lg)'
-                    }} onClick={e => e.stopPropagation()}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', color: '#09090b' }}>Testimonial Details</h2>
-                            <button onClick={() => setViewingTestimonial(null)} style={{ color: '#71717a' }}><X size={20} /></button>
-                        </div>
-                        
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem', padding: '0.875rem', background: 'var(--input)', borderRadius: '12px' }}>
-                            <div style={{ width: '40px', height: '40px', background: 'var(--primary)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.125rem', fontWeight: 800 }}>
-                                {(viewingTestimonial.customer_name?.[0] || 'A').toUpperCase()}
+                <div className="modal-overlay" onClick={() => setViewingTestimonial(null)}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                        <div className="modal-card">
+                            <div className="modal-header">
+                                <h2 className="modal-title" style={{ fontSize: '1.25rem' }}>Testimonial Details</h2>
+                                <button onClick={() => setViewingTestimonial(null)} className="modal-close-btn" aria-label="Close" type="button"><X size={18} /></button>
                             </div>
-                            <div>
-                                <div style={{ fontWeight: 800, fontSize: '1rem', color: '#09090b' }}>{viewingTestimonial.customer_name || 'Anonymous'}</div>
-                                <div style={{ display: 'flex', gap: '4px', marginTop: '2px' }}>
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star key={i} size={12} color={i < (viewingTestimonial.rating || 5) ? '#fbbf24' : '#e4e4e7'} fill={i < (viewingTestimonial.rating || 5) ? '#fbbf24' : 'transparent'} />
-                                    ))}
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem', padding: '0.875rem', background: 'var(--input)', borderRadius: '12px' }}>
+                                <div style={{ width: '40px', height: '40px', background: 'var(--primary)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.125rem', fontWeight: 800 }}>
+                                    {(viewingTestimonial.customer_name?.[0] || 'A').toUpperCase()}
                                 </div>
-                                <div style={{ fontSize: '0.75rem', color: '#71717a', marginTop: '4px' }}>
-                                    Product: <span style={{ fontWeight: 600, color: '#09090b' }}>{viewingTestimonial.products?.name}</span>
+                                <div>
+                                    <div style={{ fontWeight: 800, fontSize: '1rem', color: '#09090b' }}>{viewingTestimonial.customer_name || 'Anonymous'}</div>
+                                    <div style={{ display: 'flex', gap: '4px', marginTop: '2px' }}>
+                                        {[...Array(5)].map((_, i) => (
+                                            <Star key={i} size={12} color={i < (viewingTestimonial.rating || 5) ? '#fbbf24' : '#e4e4e7'} fill={i < (viewingTestimonial.rating || 5) ? '#fbbf24' : 'transparent'} />
+                                        ))}
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: '#71717a', marginTop: '4px' }}>
+                                        Product: <span style={{ fontWeight: 600, color: '#09090b' }}>{viewingTestimonial.products?.name}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>Testimonial Content</label>
-                            <div style={{ 
-                                padding: '1.25rem', 
-                                background: '#f8fafc', 
-                                borderRadius: '16px', 
-                                border: '1px solid #e2e8f0',
-                                fontSize: '0.9375rem',
-                                color: '#1e293b',
-                                lineHeight: '1.6',
-                                fontStyle: 'italic',
-                                whiteSpace: 'pre-wrap'
-                            }}>
-                                "{viewingTestimonial.content.trim()}"
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label style={{ fontSize: '0.7rem', fontWeight: 800, color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.5rem' }}>Testimonial Content</label>
+                                <div style={{ 
+                                    padding: '1.25rem', 
+                                    background: '#f8fafc', 
+                                    borderRadius: '16px', 
+                                    border: '1px solid #e2e8f0',
+                                    fontSize: '0.9375rem',
+                                    color: '#1e293b',
+                                    lineHeight: '1.6',
+                                    fontStyle: 'italic',
+                                    whiteSpace: 'pre-wrap'
+                                }}>
+                                    "{viewingTestimonial.content.trim()}"
+                                </div>
                             </div>
-                        </div>
 
-                        <button onClick={() => setViewingTestimonial(null)} className="btn btn-primary" style={{ width: '100%', padding: '0.875rem' }}>
-                            Close
-                        </button>
+                            <button onClick={() => setViewingTestimonial(null)} className="btn btn-primary" style={{ width: '100%', padding: '0.875rem' }}>
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
             ), document.body)}
+
         </div>
     );
 }

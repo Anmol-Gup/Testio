@@ -347,7 +347,7 @@ export default function BillingPage() {
                 </div>
             </div>
 
-            <div className="card" style={{
+            <div className="card billing-summary-card" style={{
                 marginBottom: '3rem',
                 background: 'linear-gradient(135deg, var(--primary) 0%, #1e40af 100%)',
                 color: 'white',
@@ -356,7 +356,7 @@ export default function BillingPage() {
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem' }}>
                     <div>
-                        <div style={{ fontSize: '2rem', fontWeight: 800 }}>
+                        <div className="billing-summary-card-title" style={{ fontSize: '2rem', fontWeight: 800 }}>
                             {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1).toLowerCase()} Plan
                         </div>
                         <div style={{ fontSize: '1rem', opacity: 0.9, marginTop: '0.25rem', fontWeight: 500 }}>
@@ -365,7 +365,7 @@ export default function BillingPage() {
                         <div style={{ fontSize: '0.8125rem', opacity: 0.75, marginTop: '0.25rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
                             <Clock size={14} /> Resets on {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
                         </div>
-                        <div style={{
+                        <div className="billing-summary-progress" style={{
                             width: '240px',
                             height: '8px',
                             background: 'rgba(255, 255, 255, 0.15)',
@@ -385,7 +385,7 @@ export default function BillingPage() {
                     </div>
                     <div style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: '0.875rem', opacity: 0.8, marginBottom: '0.5rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Usage Status</div>
-                        <div style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '1rem' }}>
+                        <div className="billing-summary-card-status" style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '1rem' }}>
                             {currentPlan.toLowerCase() === 'free'
                                 ? 'Free'
                                 : (isSubscriptionLoading

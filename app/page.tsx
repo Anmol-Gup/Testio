@@ -5,47 +5,55 @@ import Link from 'next/link';
 import {
   ArrowRight, Check, Zap, MessageSquare, Mail, ChevronDown,
   Monitor, Clock, ShieldCheck, BarChart3, Star, Share2,
-  Sparkles, FileText, LayoutGrid, UserPlus, Send, Layout
+  Sparkles, FileText, LayoutGrid, UserPlus, Send, Layout, Menu, X
 } from 'lucide-react';
 
 
 export default function HomePage() {
   const currentYear = new Date().getFullYear();
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
     <div style={{ background: 'var(--background)', minHeight: '100vh' }}>
       {/* Navigation */}
-      <nav style={{
-        padding: '1rem 4rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        background: 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid var(--border)'
-      }}>
-        {/* Logo Left */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Sparkles size={24} color="var(--primary)" fill="var(--primary)" />
-          <span style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--foreground)' }}>Testio</span>
+      <nav className="landing-nav">
+        <div className="landing-nav-inner">
+          <div className="landing-nav-logo">
+            <Sparkles size={24} color="var(--primary)" fill="var(--primary)" />
+            <span style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.02em' }}>Testio</span>
+          </div>
+
+          <div className="landing-nav-links">
+            <a href="#features" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--secondary)' }}>Features</a>
+            <a href="#pricing" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--secondary)' }}>Pricing</a>
+            <a href="#faq" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--secondary)' }}>FAQ</a>
+          </div>
+
+          <div className="landing-nav-actions">
+            <Link href="/login" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--foreground)' }}>Log In</Link>
+            <Link href="/signup" className="btn btn-primary nav-cta" style={{ padding: '0.625rem 1.5rem', borderRadius: '8px' }}>Get Started Free</Link>
+          </div>
+
+          <button
+            className="landing-nav-burger"
+            aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileNavOpen}
+            onClick={() => setMobileNavOpen(v => !v)}
+          >
+            {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
         </div>
 
-        {/* Links Middle */}
-        <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
-          <a href="#features" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--secondary)' }}>Features</a>
-          <a href="#pricing" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--secondary)' }}>Pricing</a>
-          <a href="#faq" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--secondary)' }}>FAQ</a>
-        </div>
+        <div className={`landing-mobile-menu${mobileNavOpen ? ' open' : ''}`}>
+          <a href="#features" onClick={() => setMobileNavOpen(false)}>Features</a>
+          <a href="#pricing" onClick={() => setMobileNavOpen(false)}>Pricing</a>
+          <a href="#faq" onClick={() => setMobileNavOpen(false)}>FAQ</a>
 
-        {/* Buttons Right */}
-        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-          <Link href="/login" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--foreground)' }}>Log In</Link>
-          <Link href="/signup" className="btn btn-primary nav-cta" style={{ padding: '0.625rem 1.5rem', borderRadius: '8px' }}>Get Started Free</Link>
+          <div className="landing-mobile-actions">
+            <Link href="/login" className="btn btn-secondary" style={{ padding: '0.75rem 1.25rem', borderRadius: '10px' }}>Log In</Link>
+            <Link href="/signup" className="btn btn-primary nav-cta" style={{ padding: '0.75rem 1.25rem', borderRadius: '10px' }}>Get Started Free</Link>
+          </div>
         </div>
       </nav>
 
