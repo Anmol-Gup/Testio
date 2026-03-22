@@ -2,8 +2,6 @@
 
 Testio automates testimonial collection for SaaS founders: send requests anytime (immediately or scheduled), follow up once, and display approved testimonials on your website with a lightweight embeddable widget.
 
-For deeper technical docs, see `documentation.md`.
-
 ## What You Can Do
 - Create products and add customers (email list)
 - Send testimonial requests immediately, or schedule them (e.g., 3 days after upgrade)
