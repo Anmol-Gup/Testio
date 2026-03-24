@@ -443,10 +443,11 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             setSendImmediately(true);
             setMonthlyUsage(prev => prev + 1);
 
-            // Calculate scheduled date (3 days from now)
+            // Calculate scheduled date (based on delay setting)
+            const initialDelay = parseInt(process.env.NEXT_PUBLIC_TESTIO_INITIAL_EMAIL_DELAY_MINUTES || '4320'); // 4320 mins = 3 days
             const scheduledDate = new Date();
-            scheduledDate.setDate(scheduledDate.getDate() + 3);
-            const formattedDate = scheduledDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+            scheduledDate.setMinutes(scheduledDate.getMinutes() + initialDelay);
+            const formattedDate = scheduledDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
             const formattedTime = scheduledDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
             setToast({

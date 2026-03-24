@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { sendTestimonialRequest, sendReminderRequest } from '@/lib/mail';
-import { subDays } from 'date-fns';
+import { subDays, subMinutes } from 'date-fns';
 
 export async function GET(request: Request) {
     // Auth check
@@ -18,14 +18,15 @@ export async function GET(request: Request) {
         };
         const planCache = new Map<string, string>();
 
-        const threeDaysAgo = subDays(new Date(), 3).toISOString();
+        const initialDelay = parseInt(process.env.NEXT_PUBLIC_TESTIO_INITIAL_EMAIL_DELAY_MINUTES || '4320'); // 4320 mins = 3 days
+        const initialThreshold = subMinutes(new Date(), initialDelay).toISOString();
 
-        // 1. Process Initial Emails (Status: 'scheduled', 3 days old)
+        // 1. Process Initial Emails (Status: 'scheduled', based on delay)
         const { data: initialBatch, error: e1 } = await supabaseAdmin
             .from('customers')
             .select('*, products(id, name, user_id)')
             .eq('status', 'scheduled')
-            .lte('created_at', threeDaysAgo);
+            .lte('created_at', initialThreshold);
 
         if (e1) throw e1;
 
@@ -89,12 +90,15 @@ export async function GET(request: Request) {
             }
         }
 
-        // 2. Process Reminders (Status: 'initial_sent', 3 days after initial email)
+        const reminderDelay = parseInt(process.env.NEXT_PUBLIC_TESTIO_REMINDER_EMAIL_DELAY_MINUTES || '4320');
+        const reminderThreshold = subMinutes(new Date(), reminderDelay).toISOString();
+
+        // 2. Process Reminders (Status: 'initial_sent', based on delay)
         const { data: reminderBatch, error: e2 } = await supabaseAdmin
             .from('customers')
             .select('*, products(id, name, user_id)')
             .eq('status', 'initial_sent')
-            .lte('last_email_sent_at', threeDaysAgo);
+            .lte('last_email_sent_at', reminderThreshold);
 
         if (e2) throw e2;
 
