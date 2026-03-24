@@ -132,7 +132,6 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 .single();
             if (prodErr) throw prodErr;
 
-            // Fetch metrics
             const { count: upgraderCount } = await supabase
                 .from('customers')
                 .select('*', { count: 'exact', head: true })
@@ -144,19 +143,36 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 .eq('product_id', params.id)
                 .neq('status', 'scheduled');
 
+            // 1. Fetch Email Responses
+            const { count: emailResponses } = await supabase
+                .from('testimonials')
+                .select('*', { count: 'exact', head: true })
+                .eq('product_id', params.id)
+                .eq('source', 'email');
+
+            // 2. Fetch Direct Responses
+            const { count: directResponses } = await supabase
+                .from('testimonials')
+                .select('*', { count: 'exact', head: true })
+                .eq('product_id', params.id)
+                .or('source.eq.direct,source.is.null'); // Consider older testimonials as direct or specifically 'direct'
+
             const { count: totalResponses } = await supabase
                 .from('testimonials')
                 .select('*', { count: 'exact', head: true })
                 .eq('product_id', params.id);
 
-            const convRate = upgraderCount && upgraderCount > 0
-                ? Math.round(((totalResponses || 0) / upgraderCount) * 100)
+            // Conversion rate is strictly for email flow: email_responses / sentCount
+            const convRate = sentCount && sentCount > 0
+                ? Math.round(((emailResponses || 0) / sentCount) * 100)
                 : 0;
 
             setProduct({
                 ...prod,
                 upgrades: upgraderCount || 0,
                 emails_sent: sentCount || 0,
+                email_responses: emailResponses || 0,
+                direct_responses: directResponses || 0,
                 responses: totalResponses || 0,
                 conversion_rate: convRate
             });
@@ -558,14 +574,15 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                         marginBottom: '2rem'
                     }}>
                         {[
-                            { label: 'Customers', value: product.upgrades || 0, color: 'var(--primary)' },
+                            { label: 'Customers', value: product.upgrades || 0, color: '#6366f1' },
                             { label: 'Requests Sent', value: product.emails_sent || 0, color: '#8b5cf6' },
-                            { label: 'Responses', value: product.responses || 0, color: '#ec4899' },
-                            { label: 'Conv. Rate', value: product.conversion_rate ? `${product.conversion_rate}%` : '0%', color: '#10b981' },
+                            { label: 'Email Responses', value: product.email_responses || 0, color: '#ec4899' },
+                            { label: 'Direct Responses', value: product.direct_responses || 0, color: '#f59e0b' },
+                            { label: 'Response Rate', value: product.conversion_rate ? `${product.conversion_rate}%` : '0%', color: '#10b981' },
                         ].map((stat, i) => (
-                            <div key={i} className="card" style={{ padding: '1rem 1.5rem' }}>
+                            <div key={i} className="card" style={{ padding: '1rem 1.25rem' }}>
                                 <div style={{ fontSize: '0.65rem', color: '#71717a', textTransform: 'uppercase', marginBottom: '0.25rem', fontWeight: 800, letterSpacing: '0.05em' }}>{stat.label}</div>
-                                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#09090b' }}>{stat.value}</div>
+                                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#09090b' }}>{stat.value}</div>
                             </div>
                         ))}
                     </div>

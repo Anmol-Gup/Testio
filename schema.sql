@@ -47,6 +47,7 @@ CREATE TABLE testimonials (
   customer_name TEXT NOT NULL,
   company TEXT,
   rating INTEGER,
+  source TEXT DEFAULT 'direct', -- 'email' or 'direct'
   status TEXT DEFAULT 'pending',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );

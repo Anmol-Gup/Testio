@@ -30,52 +30,82 @@ export default function DashboardPage() {
             }
 
             // 1. Fetch Stats Aggregates
-            // Filter by current user's products
-            const { count: totalUpgraders } = await supabase
+            // Total customers (all in the customers table)
+            const { count: totalCustomersCount } = await supabase
                 .from('customers')
                 .select('id, products!inner(user_id)', { count: 'exact', head: true })
                 .eq('products.user_id', user.id);
+
+            // Total requests sent (status != 'scheduled')
+            const { count: requestsSent } = await supabase
+                .from('customers')
+                .select('id, products!inner(user_id)', { count: 'exact', head: true })
+                .eq('products.user_id', user.id)
+                .neq('status', 'scheduled');
             
-            const { count: totalResponses } = await supabase
+            // Total email responses
+            const { count: emailResponses } = await supabase
                 .from('testimonials')
                 .select('id, products!inner(user_id)', { count: 'exact', head: true })
-                .eq('products.user_id', user.id);
+                .eq('products.user_id', user.id)
+                .eq('source', 'email');
 
-            const rate = totalUpgraders ? Math.round(((totalResponses || 0) / (totalUpgraders || 1)) * 100) : 0;
+            const rate = requestsSent ? Math.round(((emailResponses || 0) / (requestsSent || 1)) * 100) : 0;
 
-            const up = totalUpgraders || 0;
-            const res = totalResponses || 0;
+            const total = totalCustomersCount || 0;
+            const reqs = requestsSent || 0;
+            const res = emailResponses || 0;
+            
             setStats([
-                { label: 'Customers', value: up.toString(), icon: <Users size={20} />, trend: up > 0 ? `+${Math.min(100, up * 5)}%` : '0%', color: 'var(--primary)' },
-                { label: 'Requests', value: up.toString(), icon: <Mail size={20} />, trend: up > 0 ? `+${Math.min(100, Math.round(up * 3.5))}%` : '0%', color: '#8b5cf6' },
-                { label: 'Responses', value: res.toString(), icon: <MessageSquare size={20} />, trend: res > 0 ? `+${Math.min(100, Math.round(res * 6))}%` : '0%', color: '#ec4899' },
-                { label: 'Conv. Rate', value: `${rate}%`, icon: <TrendingUp size={20} />, trend: rate > 0 ? `+${Math.min(100, Math.round(rate * 0.5))}%` : '0%', color: 'var(--success)' },
+                { label: 'Total Customers', value: total.toString(), icon: <Users size={20} />, trend: total > 0 ? `+${Math.min(100, total * 5)}%` : '0%', color: 'var(--primary)' },
+                { label: 'Requests Sent', value: reqs.toString(), icon: <Mail size={20} />, trend: reqs > 0 ? `+${Math.min(100, Math.round(reqs * 3.5))}%` : '0%', color: '#8b5cf6' },
+                { label: 'Email Responses', value: res.toString(), icon: <MessageSquare size={20} />, trend: res > 0 ? `+${Math.min(100, Math.round(res * 6))}%` : '0%', color: '#ec4899' },
+                { label: 'Response Rate', value: `${rate}%`, icon: <TrendingUp size={20} />, trend: rate > 0 ? `+${Math.min(100, Math.round(rate * 0.5))}%` : '0%', color: 'var(--success)' },
             ]);
 
             // 2. Fetch Top Products
+            // We need to get products and their testimonials/customers counts
+            // But Supabase simple count doesn't filter by 'source' easily in a join without subqueries or multiple calls
+            // For dashboard simplicity, I'll fetch products and then compute details
             const { data: prods, error } = await supabase
                 .from('products')
                 .select(`
                     id, 
-                    name, 
-                    testimonials (count),
-                    customers (count)
+                    name
                 `)
                 .eq('user_id', user.id)
                 .limit(3);
 
             if (error) throw error;
 
-            const formattedProds = prods.map((p: any) => {
-                const tests = p.testimonials?.[0]?.count || 0;
-                const custs = p.customers?.[0]?.count || 0;
+            const formattedProds = await Promise.all(prods.map(async (p: any) => {
+                // Get email responses for this product
+                const { count: eRes } = await supabase
+                    .from('testimonials')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('product_id', p.id)
+                    .eq('source', 'email');
+                
+                // Get requests sent for this product
+                const { count: sReq } = await supabase
+                    .from('customers')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('product_id', p.id)
+                    .neq('status', 'scheduled');
+                
+                // Get total responses (for display)
+                const { count: tRes } = await supabase
+                    .from('testimonials')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('product_id', p.id);
+
                 return {
                     id: p.id,
                     name: p.name,
-                    count: tests,
-                    rate: custs ? `${Math.round((tests / custs) * 100)}%` : '0%'
+                    count: tRes || 0,
+                    rate: sReq ? `${Math.round(((eRes || 0) / sReq) * 100)}%` : '0%'
                 };
-            });
+            }));
 
             setProducts(formattedProds);
 
@@ -229,7 +259,7 @@ export default function DashboardPage() {
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <div style={{ fontSize: '1rem', fontWeight: 800, color: '#09090b' }}>{product.rate}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--success)', fontWeight: 700 }}>Conv. Rate</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--success)', fontWeight: 700 }}>Response Rate</div>
                                 </div>
                             </div>
                         ))}

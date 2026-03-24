@@ -52,13 +52,15 @@ export async function POST(request: Request) {
                     customer_name: customer_name,
                     customer_email: customerEmail,
                     company: company || null,
+                    source: customerId ? 'email' : 'direct', // Track if response came from email request
                     status: 'pending' // requires approval
                 }
             ]);
 
-        // Fallback: If customer_id column doesn't exist yet (schema drift)
-        if (testimonialErr && (testimonialErr as any).code === 'PGRST204') {
-            console.warn('customer_id column missing, falling back to basic insert');
+        // Fallback: If customer_id or source column doesn't exist yet (schema drift)
+        if (testimonialErr && (testimonialErr as any).code === 'PGRST204' || (testimonialErr as any).code === '42703') {
+            console.warn('customer_id or source column missing, falling back to basic insert');
+
             const fallback = await supabaseAdmin
                 .from('testimonials')
                 .insert([
