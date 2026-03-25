@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { MessageSquare, Check, X, Trash2, Loader2, Star, Eye } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 10;
 
 export default function GlobalTestimonialsPage() {
     const [testimonials, setTestimonials] = useState<any[]>([]);
