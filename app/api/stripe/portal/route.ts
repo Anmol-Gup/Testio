@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getAppUrl } from '@/lib/url';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -19,8 +20,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Stripe customer record not linked to your account. This usually happens if the plan was updated manually in the database without a Stripe subscription.' }, { status: 404 });
         }
 
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-        const defaultReturnUrl = `${appUrl}/billing`;
+        const defaultReturnUrl = `${getAppUrl()}/billing`;
 
         // If requested, open Stripe directly in the subscription-cancel flow and
         // auto-redirect back to billing after completion.
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
                     after_completion: {
                         type: 'redirect',
                         redirect: {
-                            return_url: `${appUrl}/billing?canceled=true&source=portal`,
+                            return_url: `${getAppUrl()}/billing?canceled=true&source=portal`,
                         },
                     },
                 },

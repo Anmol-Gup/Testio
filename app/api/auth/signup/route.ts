@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import bcrypt from 'bcryptjs'
 import { transporter } from '@/lib/nodemailer'
+import { getAppUrl } from '@/lib/url'
 
 export async function POST(req: Request) {
     try {
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
             email: email,
             password: password,
             options: {
-                redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/login?verified=true`
+                redirectTo: `${getAppUrl()}/login?verified=true`
             }
         });
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getAppUrl } from '@/lib/url';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -71,8 +72,8 @@ export async function POST(req: Request) {
             ],
             customer: customerId,
             metadata: { userId, plan: planKey },
-            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/billing?success=true&plan=${planKey}&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/billing?canceled=true`,
+            success_url: `${getAppUrl()}/billing?success=true&plan=${planKey}&session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${getAppUrl()}/billing?canceled=true`,
         });
 
         return NextResponse.json({ url: session.url });

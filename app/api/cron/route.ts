@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { sendTestimonialRequest, sendReminderRequest } from '@/lib/mail';
 import { subDays, subMinutes } from 'date-fns';
+import { getAppUrl } from '@/lib/url';
 
 export async function GET(request: Request) {
     // Auth check
@@ -57,7 +58,7 @@ export async function GET(request: Request) {
                     continue;
                 }
 
-                const submitLink = `${process.env.NEXT_PUBLIC_APP_URL}/submit/${customer.products.id}?cid=${customer.id}`;
+                const submitLink = `${getAppUrl()}/submit/${customer.products.id}?cid=${customer.id}`;
                 const ownerId = customer.products.user_id as string | undefined;
                 let ownerPlan = ownerId ? planCache.get(ownerId) : undefined;
                 if (!ownerPlan && ownerId) {
@@ -127,7 +128,7 @@ export async function GET(request: Request) {
                     continue;
                 }
 
-                const submitLink = `${process.env.NEXT_PUBLIC_APP_URL}/submit/${customer.products.id}?cid=${customer.id}`;
+                const submitLink = `${getAppUrl()}/submit/${customer.products.id}?cid=${customer.id}`;
                 const ownerId = customer.products.user_id as string | undefined;
                 let ownerPlan = ownerId ? planCache.get(ownerId) : undefined;
                 if (!ownerPlan && ownerId) {

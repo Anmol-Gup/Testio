@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { sendTestimonialRequest } from '@/lib/mail';
+import { getAppUrl } from '@/lib/url';
 
 export async function POST(req: Request) {
     try {
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
         }
 
         // 3. Send the email
-        const submitLink = `${process.env.NEXT_PUBLIC_APP_URL}/submit/${finalProductId}?cid=${customerId}`;
+        const submitLink = `${getAppUrl()}/submit/${finalProductId}?cid=${customerId}`;
 
         await sendTestimonialRequest({
             to: email,

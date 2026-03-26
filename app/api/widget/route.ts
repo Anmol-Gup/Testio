@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { getAppUrl } from '@/lib/url';
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
@@ -42,7 +43,7 @@ export async function GET(req: Request) {
         return new NextResponse('Error fetching testimonials', { status: 500 });
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl = getAppUrl();
 
     const widgetJs = `
 (function() {
