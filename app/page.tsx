@@ -86,9 +86,51 @@ export default function HomePage() {
             <Link href="/signup" className="btn btn-primary nav-cta" style={{ padding: '0.875rem 2rem', fontSize: '16px', borderRadius: '12px' }}>
               Get Started for Free <ArrowRight size={20} />
             </Link>
-            <Link href="#how-it-works" className="btn btn-secondary" style={{ padding: '0.875rem 2rem', fontSize: '16px', borderRadius: '12px' }}>
+            <Link href="#video" className="btn btn-secondary" style={{ padding: '0.875rem 2rem', fontSize: '16px', borderRadius: '12px' }}>
               Watch how it works
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Section */}
+      <section id="video" className="section" style={{ padding: '2rem 1.5rem 6rem', background: 'white' }}>
+        <div className="container" style={{ maxWidth: '1000px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '1rem' }}>
+              See it in <span style={{ color: 'var(--primary)' }}>action</span>
+            </h2>
+            <p style={{ fontSize: '18px', color: 'var(--secondary)', maxWidth: '600px', margin: '0 auto' }}>
+              Watch how quickly you can start collecting and displaying testimonials.
+            </p>
+          </div>
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            paddingTop: '56.25%', /* 16:9 Aspect Ratio */
+            borderRadius: '24px',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(139, 92, 246, 0.25)',
+            border: '1px solid var(--border)',
+            background: 'var(--input)',
+            transform: 'translateZ(0)' // Fix for border radius on some browsers
+          }}>
+            <iframe
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                width: '100%',
+                height: '100%',
+                border: 'none'
+              }}
+              src="https://www.youtube.com/embed/3KrqyurI6sw?start=44"
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            ></iframe>
           </div>
         </div>
       </section>
