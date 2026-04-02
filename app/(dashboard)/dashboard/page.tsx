@@ -1,6 +1,6 @@
 'use client';
 
-import { TrendingUp, Users, Mail, MessageSquare, Loader2 } from 'lucide-react';
+import { TrendingUp, Users, Mail, MessageSquare, Loader2, AlertCircle, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -15,6 +15,7 @@ export default function DashboardPage() {
         { label: 'Conv. Rate', value: '0%', icon: <TrendingUp size={20} />, trend: '0%', color: 'var(--success)' },
     ]);
     const [loading, setLoading] = useState(true);
+    const [usage, setUsage] = useState({ count: 0, limit: 10, plan: 'Free' });
 
     useEffect(() => {
         fetchDashboardData();
@@ -28,6 +29,37 @@ export default function DashboardPage() {
                 setLoading(false);
                 return;
             }
+
+            // 0. Fetch User Plan & Current Month Usage
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('plan')
+                .eq('id', user.id)
+                .single();
+            
+            const currentPlan = profile?.plan || 'free';
+            const limits: any = {
+                free: 10,
+                starter: 200,
+                pro: 1000
+            };
+            const planLimit = limits[currentPlan.toLowerCase()] || 10;
+
+            const firstDayOfMonth = new Date();
+            firstDayOfMonth.setDate(1);
+            firstDayOfMonth.setHours(0, 0, 0, 0);
+
+            const { count: monthlyEmailCount } = await supabase
+                .from('customers')
+                .select('id, products!inner(user_id)', { count: 'exact', head: true })
+                .eq('products.user_id', user.id)
+                .gte('created_at', firstDayOfMonth.toISOString());
+            
+            setUsage({
+                count: monthlyEmailCount || 0,
+                limit: planLimit,
+                plan: currentPlan
+            });
 
             // 1. Fetch Stats Aggregates
             // Total customers (all in the customers table)
@@ -135,9 +167,86 @@ export default function DashboardPage() {
 
     return (
         <div className="animate-fade-in">
-            <header style={{ marginBottom: '1.5rem' }}>
-                <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 800, color: '#09090b', letterSpacing: '-0.02em' }}>Dashboard</h1>
-                <p style={{ fontSize: '0.875rem', color: '#71717a', marginTop: '0.25rem' }}>Welcome back! Here's your social proof performance.</p>
+            <header style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                    <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 800, color: '#09090b', letterSpacing: '-0.02em' }}>Dashboard</h1>
+                    <p style={{ fontSize: '0.875rem', color: '#71717a', marginTop: '0.25rem' }}>Welcome back! Here's your social proof performance.</p>
+                </div>
+
+                {/* Usage Bar Card */}
+                <div className="card" style={{ 
+                    padding: '1rem 1.25rem', 
+                    flex: '1', 
+                    maxWidth: '400px', 
+                    minWidth: '300px',
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '0.75rem',
+                    background: 'linear-gradient(to bottom right, var(--card), #f8fafc)',
+                    border: '1px solid var(--border)',
+                    boxShadow: 'var(--shadow-sm)',
+                    margin: 0
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#09090b', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            <div style={{ padding: '6px', background: 'rgba(139, 92, 246, 0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Activity size={14} color="var(--primary)" />
+                            </div>
+                            Usage
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '0.875rem', color: '#09090b', fontWeight: 800 }}>
+                                {usage.count} <span style={{ color: '#71717a', fontWeight: 500, fontSize: '0.75rem' }}>/ {usage.limit} emails</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style={{ 
+                        width: '100%', 
+                        height: '8px', 
+                        background: '#f1f5f9', 
+                        borderRadius: '10px', 
+                        overflow: 'hidden',
+                        position: 'relative',
+                        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)'
+                    }}>
+                        <div style={{ 
+                            width: `${Math.min((usage.count / usage.limit) * 100, 100)}%`, 
+                            height: '100%', 
+                            background: (usage.count / usage.limit) >= 0.9 ? 'var(--error)' : 'var(--primary)',
+                            borderRadius: '10px',
+                            transition: 'width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                            boxShadow: (usage.count / usage.limit) >= 0.9 ? '0 0 12px rgba(239, 68, 68, 0.4)' : '0 0 12px rgba(139, 92, 246, 0.3)'
+                        }} />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ fontSize: '0.75rem', color: '#71717a', fontWeight: 600 }}>
+                            <span style={{ textTransform: 'capitalize', color: 'var(--primary)' }}>{usage.plan}</span> plan
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            {(usage.count / usage.limit) >= 0.8 && (
+                                <div style={{ fontSize: '0.75rem', color: 'var(--error)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                    <AlertCircle size={12} />
+                                    {(usage.count / usage.limit) >= 1 ? 'Limit reached' : 'Low balance'}
+                                </div>
+                            )}
+                            <Link href="/billing" style={{ 
+                                fontSize: '0.75rem', 
+                                fontWeight: 700, 
+                                color: 'var(--primary)', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '2px',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                background: 'rgba(139, 92, 246, 0.05)'
+                            }}>
+                                {usage.count >= usage.limit ? 'Upgrade' : 'Manage'} →
+                            </Link>
+                        </div>
+                    </div>
+                </div>
             </header>
 
             <div style={{
