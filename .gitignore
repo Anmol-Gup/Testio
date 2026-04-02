@@ -37,3 +37,5 @@ next-env.d.ts
 
 documentation.md
 test_db.js
+qa_report.md
+plan_limits_report.md
